@@ -171,6 +171,10 @@ muset_options_t muset_cli(std::shared_ptr<bc::Parser<0>> cli, muset_options_t op
         ->checker(bc::check::is_number)
         ->setter(options->nb_threads);
 
+    cli->add_param("--connected_components", "output metrics for connected components, not only unitigs. Includes automatically -e.")
+        ->as_flag()
+        ->setter(options->connected_components);
+
     cli->add_param("-h/--help", "show this message and exit.")
         ->as_flag()
         ->action(bc::Action::ShowHelp);
@@ -178,12 +182,6 @@ muset_options_t muset_cli(std::shared_ptr<bc::Parser<0>> cli, muset_options_t op
     cli->add_param("-v/--version", "show version and exit.")
         ->as_flag()
         ->action(bc::Action::ShowVersion);
-
-    // cli->add_param("--verbose", "verbosity level [debug|info|warning|error].")
-    //    ->meta("STR")
-    //    ->def("info")
-    //    ->checker(bc::check::f::in("debug|info|warning|error"))
-    //    ->setter(options->verbosity);
 
   return options;
 }

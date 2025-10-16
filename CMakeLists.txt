@@ -161,6 +161,7 @@ FetchContent_Declare(
   GIT_TAG v1.17.0
 )
 FetchContent_MakeAvailable(googletest)
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 ############################################################
 ## config.hpp file
@@ -189,6 +190,7 @@ set(kmat_tools_sources
     src/kmat_unitig.cpp
     src/kmat_cli.cpp
     src/kmat_tools.cpp
+    src/kmat_conncomp.cpp
 )
 
 add_executable(kmat_tools ${kmat_tools_sources})
@@ -206,6 +208,7 @@ set(muset_sources
     src/kmat_fasta.cpp
     src/kmat_filter.cpp
     src/kmat_unitig.cpp
+    src/kmat_conncomp.cpp
     src/muset_cli.cpp
     src/muset.cpp
 )
@@ -235,16 +238,38 @@ target_link_libraries(muset_pa ${deps_libs})
 add_dependencies(muset_pa ${deps})
 
 #############################################################
-# Test executable
+# Aggregator test executable
 add_executable(aggregator_tests
   unit_tests/aggregator.cpp
 )
 target_include_directories(aggregator_tests PRIVATE
   ${includes}
-  # other paths?
+  ${PROJECT_BINARY_DIR}/include
+  ${gtest_SOURCE_DIR}/include
 )
 target_link_libraries(aggregator_tests PRIVATE
   GTest::gtest_main
+  GTest::gtest
   ${deps_libs}
 )
+add_dependencies(aggregator_tests ${deps})
 add_test(NAME aggregator_tests COMMAND aggregator_tests)
+
+#############################################################
+# GraphHandler test executable
+add_executable(graph_handler_tests
+  unit_tests/graph_handler.cpp
+)
+target_include_directories(graph_handler_tests PRIVATE
+  ${includes}
+  ${PROJECT_BINARY_DIR}/include
+  ${gtest_SOURCE_DIR}/include
+)
+target_link_libraries(graph_handler_tests PRIVATE
+  GTest::gtest_main
+  GTest::gtest
+  ${deps_libs}
+  Threads::Threads
+)
+add_dependencies(graph_handler_tests ${deps})
+add_test(NAME graph_handler_tests COMMAND graph_handler_tests)

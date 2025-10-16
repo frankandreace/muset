@@ -10,3 +10,4 @@
 #include <kmat_tools/cmd/reverse.h>
 #include <kmat_tools/cmd/select.h>
 #include <kmat_tools/cmd/unitig.h>
+#include <kmat_tools/cmd/conncomp.h>

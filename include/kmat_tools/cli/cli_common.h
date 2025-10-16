@@ -24,6 +24,7 @@ enum class COMMAND
   REVERSE,
   SELECT,
   UNITIG,
+  CONNECTEDCOMPONENTS,
   UNKNOWN
 };
 
@@ -49,7 +50,9 @@ inline COMMAND str_to_cmd(const std::string& s)
     return COMMAND::SELECT;
   else if (s == "unitig")
     return COMMAND::UNITIG;
-  else 
+  else if (s == "conncomp")
+    return COMMAND::CONNECTEDCOMPONENTS;
+  else
     return COMMAND::UNKNOWN;
 }
 
@@ -75,6 +78,8 @@ inline std::string cmd_to_str(COMMAND cmd)
     return "select";
   else if (cmd == COMMAND::UNITIG)
     return "unitig";
+  else if (cmd == COMMAND::CONNECTEDCOMPONENTS)
+    return "conncomp";
   else // (cmd == COMMAND::UNKNOWN)
     return "unknown";
 }

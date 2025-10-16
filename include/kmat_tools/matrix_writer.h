@@ -12,6 +12,40 @@
 
 namespace fs = std::filesystem;
 
+
+class CompressedTSVComponentWriter {
+  public:
+    CompressedTSVComponentWriter(const std::string& filepath) {
+      m_stream = gzopen(filepath.c_str(), "wb");
+      if (!m_stream) {
+        throw std::runtime_error(fmt::format("Cannot open file: {}", filepath));
+      }
+    }
+
+    ~CompressedTSVComponentWriter() {
+      if (m_stream) {
+        gzclose(m_stream);
+      }
+    }
+
+    // Delete copy
+    CompressedTSVComponentWriter(const CompressedTSVComponentWriter&) = delete;
+    CompressedTSVComponentWriter& operator=(const CompressedTSVComponentWriter&) = delete;
+
+    // Write identifier followed by all vector elements
+    void write_row(const std::string& identifier, const std::vector<uint64_t>& values) {
+      gzprintf(m_stream, "%s", identifier.c_str());
+      for (const auto& val : values) {
+        gzprintf(m_stream, "\t%lu", val);
+      }
+      gzputs(m_stream, "\n");
+    }
+
+  private:
+    gzFile m_stream = nullptr;
+};
+
+
 // Interface to write the matrix into a file
 class MatrixWriter {
   public:

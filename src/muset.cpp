@@ -18,8 +18,10 @@
 #include <kmat_tools/cmd/fasta.h>
 #include <kmat_tools/cmd/filter.h>
 #include <kmat_tools/cmd/unitig.h>
+#include <kmat_tools/cmd/conncomp.h>
 #include <kmat_tools/matrix.h>
 #include <kmat_tools/utils.h>
+
 
 #include "muset_cli.h"
 
@@ -195,6 +197,23 @@ void kmat_unitig(muset::muset_options_t muset_opt) {
     kmat::main_unitig(unitig_opt);
 }
 
+void kmat_connected_component(muset::muset_options_t muset_opt) {
+    auto conncomp_opt =  std::make_shared<kmat::conncomp_options>();
+    conncomp_opt->kmer_size = muset_opt->kmer_size;
+    conncomp_opt->mini_size = muset_opt->mini_size;
+    conncomp_opt->prefix = muset_opt->unitig_prefix;
+    conncomp_opt->min_frac = muset_opt->min_utg_frac;
+    conncomp_opt->write_frac_matrix = muset_opt->write_frac_matrix;
+    conncomp_opt->nb_threads = muset_opt->nb_threads;
+    conncomp_opt->output_format = muset_opt->output_format;
+    conncomp_opt->abundance_metric = muset_opt->abundance_metric;
+
+    (conncomp_opt->inputs).push_back(muset_opt->filtered_unitigs);
+    (conncomp_opt->inputs).push_back(muset_opt->filtered_matrix);
+
+    kmat::main_connected_component(conncomp_opt);
+}
+
 int main(int argc, char* argv[])
 {
     muset::musetCli cli("muset", "a pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.", PROJECT_VER, "");
@@ -280,6 +299,7 @@ int main(int argc, char* argv[])
 
         spdlog::info(fmt::format("Building unitigs"));
         muset_opt->unitigs = muset_opt->out_dir/"unitigs";
+        if(muset_opt->connected_components) {muset_opt->unitig_edges = true;} // always true if connected_components
         ggcat(muset_opt);
 
         spdlog::info(fmt::format("Filtering unitigs"));
@@ -291,10 +311,16 @@ int main(int argc, char* argv[])
             throw std::runtime_error("No unitig retained to build the output matrix (filters were probably too strict).");
         }
 
-        spdlog::info(fmt::format("Building unitig matrix"));
-        muset_opt->unitig_prefix = muset_opt->out_dir/"unitigs";
-        kmat_unitig(muset_opt);
-
+        if (muset_opt->connected_components){
+            spdlog::info(fmt::format("Building connected components and unitig matrix"));
+            muset_opt->unitig_prefix = muset_opt->out_dir/"";
+            kmat_connected_component(muset_opt);
+        }
+        else {
+            spdlog::info(fmt::format("Building unitig matrix"));
+            muset_opt->unitig_prefix = muset_opt->out_dir/"unitigs";
+            kmat_unitig(muset_opt);
+        }
         spdlog::debug(fmt::format("Removing temporary files"));
         muset_opt->remove_temp_files();
     }

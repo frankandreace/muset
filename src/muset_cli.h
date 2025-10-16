@@ -52,6 +52,8 @@ struct muset_options
     bool logan{false};
     bool unitig_edges{false};
 
+    bool connected_components{false};
+
     int nb_threads{1};
 
     fs::path abundance_metric;

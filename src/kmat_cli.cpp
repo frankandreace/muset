@@ -15,9 +15,9 @@ kmatCli::kmatCli(
     const std::string& desc,
     const std::string& version,
     const std::string& authors)
-{   
+{
     cli = std::make_shared<bc::Parser<1>>(bc::Parser<1>(name, desc, version, authors));
-  
+
     convert_opt = std::make_shared<struct convert_options>();
     diff_opt = std::make_shared<struct diff_options>();
     fafmt_opt = std::make_shared<struct fafmt_options>();
@@ -27,6 +27,7 @@ kmatCli::kmatCli(
     reverse_opt = std::make_shared<struct reverse_options>();
     select_opt = std::make_shared<struct select_options>();
     unitig_opt = std::make_shared<struct unitig_options>();
+    conncomp_opt = std::make_shared<struct conncomp_options>();
 
     convert_cli(cli, convert_opt);
     diff_cli(cli, diff_opt);
@@ -36,6 +37,7 @@ kmatCli::kmatCli(
     merge_cli(cli, merge_opt);
     reverse_cli(cli, reverse_opt);
     unitig_cli(cli, unitig_opt);
+    conncomp_cli(cli, conncomp_opt);
 }
 
 std::tuple<COMMAND, kmat_opt_t> kmatCli::parse(int argc, char* argv[])
@@ -99,6 +101,10 @@ std::tuple<COMMAND, kmat_opt_t> kmatCli::parse(int argc, char* argv[])
         this->unitig_opt->inputs = cli->get_positionals();
         return std::make_tuple(COMMAND::UNITIG, this->unitig_opt);
     }
+    else if (cli->is("conncomp")) {
+        this->unitig_opt->inputs = cli->get_positionals();
+        return std::make_tuple(COMMAND::CONNECTEDCOMPONENTS, this->conncomp_opt);
+    }
     else {
         return std::make_tuple(COMMAND::UNKNOWN, std::make_shared<struct kmat_options>());
     }
@@ -136,11 +142,11 @@ kmat_opt_t convert_cli(std::shared_ptr<bc::Parser<1>> cli, convert_opt_t opt)
          ->meta("FILE")
          ->def("")
          ->setter(opt->out_fname);
-    
+
     convert->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     convert->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -156,12 +162,12 @@ kmat_opt_t convert_cli(std::shared_ptr<bc::Parser<1>> cli, convert_opt_t opt)
 kmat_opt_t diff_cli(std::shared_ptr<bc::Parser<1>> cli, diff_opt_t opt)
 {
     bc::cmd_t diff = cli->add_command("diff", "Difference between two sorted k-mer matrices");
-    
+
     diff->add_param("-o/--output", "output file. {stdout}")
          ->meta("FILE")
          ->def("")
          ->setter(opt->output);
-    
+
     diff->add_param("-z/--actg", "use A<C<T<G order of nucleotides")
          ->as_flag()
          ->setter(opt->actg_order);
@@ -169,7 +175,7 @@ kmat_opt_t diff_cli(std::shared_ptr<bc::Parser<1>> cli, diff_opt_t opt)
     diff->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     diff->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -193,11 +199,11 @@ kmat_opt_t fafmt_cli(std::shared_ptr<bc::Parser<1>> cli, fafmt_opt_t opt)
          ->meta("FILE")
          ->def("")
          ->setter(opt->output);
-    
+
     fafmt->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     fafmt->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -216,11 +222,11 @@ kmat_opt_t fasta_cli(std::shared_ptr<bc::Parser<1>> cli, fasta_opt_t opt)
          ->meta("FILE")
          ->def("")
          ->setter(opt->output);
-    
+
     fasta->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     fasta->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -281,7 +287,7 @@ kmat_opt_t filter_cli(std::shared_ptr<bc::Parser<1>> cli, filter_opt_t opt)
         ->callback([opt](){ opt->min_nb_present_set = true; });
 
     filter->add_group("other options", "");
-    
+
     filter->add_param("--keep-tmp", "keep temporary files.")
         ->as_flag()
         ->setter(opt->keep_tmp);
@@ -295,7 +301,7 @@ kmat_opt_t filter_cli(std::shared_ptr<bc::Parser<1>> cli, filter_opt_t opt)
     filter->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     filter->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -314,12 +320,12 @@ kmat_opt_t merge_cli(std::shared_ptr<bc::Parser<1>> cli, merge_opt_t opt)
          ->meta("INT")
          ->def("31")
          ->setter(opt->kmer_size);
-    
+
     merge->add_param("-o/--output", "output file. {stdout}")
          ->meta("FILE")
          ->def("")
          ->setter(opt->output);
-    
+
     merge->add_param("-z/--actg", "use A<C<T<G order of nucleotides")
          ->as_flag()
          ->setter(opt->actg_order);
@@ -327,7 +333,7 @@ kmat_opt_t merge_cli(std::shared_ptr<bc::Parser<1>> cli, merge_opt_t opt)
     merge->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     merge->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -341,7 +347,7 @@ kmat_opt_t merge_cli(std::shared_ptr<bc::Parser<1>> cli, merge_opt_t opt)
 kmat_opt_t reverse_cli(std::shared_ptr<bc::Parser<1>> cli, reverse_opt_t opt)
 {
     bc::cmd_t reverse = cli->add_command("reverse", "Reverse-complement k-mers in a k-mer matrix file.");
-    
+
     reverse->add_param("-o/--output", "output file. {stdout}")
          ->meta("FILE")
          ->def("")
@@ -358,7 +364,7 @@ kmat_opt_t reverse_cli(std::shared_ptr<bc::Parser<1>> cli, reverse_opt_t opt)
     reverse->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     reverse->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);
@@ -372,7 +378,7 @@ kmat_opt_t reverse_cli(std::shared_ptr<bc::Parser<1>> cli, reverse_opt_t opt)
 kmat_opt_t select_cli(std::shared_ptr<bc::Parser<1>> cli, select_opt_t opt)
 {
     bc::cmd_t select = cli->add_command("select", "Select from an input matrix only k-mers that belong to a reference matrix.");
-    
+
     select->add_param("-o/--output", "output file. {stdout}")
          ->meta("FILE")
          ->def("")
@@ -385,7 +391,7 @@ kmat_opt_t select_cli(std::shared_ptr<bc::Parser<1>> cli, select_opt_t opt)
     select->add_param("-h/--help", "show this message and exit.")
          ->as_flag()
          ->action(bc::Action::ShowHelp);
-    
+
     select->add_param("-v/--version", "show version and exit.")
          ->as_flag()
          ->action(bc::Action::ShowVersion);

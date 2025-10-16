@@ -17,6 +17,7 @@
 #include <kmat_tools/cli/reverse.h>
 #include <kmat_tools/cli/select.h>
 #include <kmat_tools/cli/unitig.h>
+#include <kmat_tools/cli/conncomp.h>
 
 
 namespace kmat
@@ -35,9 +36,9 @@ public:
     std::tuple<COMMAND, kmat_opt_t> parse(int argc, char* argv[]);
 
 private:
-  
+
     cli_t cli {nullptr};
-    
+
     convert_opt_t convert_opt {nullptr};
     diff_opt_t    diff_opt {nullptr};
     fafmt_opt_t   fafmt_opt {nullptr};
@@ -47,6 +48,7 @@ private:
     reverse_opt_t reverse_opt {nullptr};
     select_opt_t  select_opt {nullptr};
     unitig_opt_t  unitig_opt {nullptr};
+    conncomp_opt_t conncomp_opt {nullptr};
 };
 
 };  // namespace kmat

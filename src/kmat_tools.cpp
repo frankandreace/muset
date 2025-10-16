@@ -62,6 +62,10 @@ int main(int argc, char* argv[])
             kmat::unitig_opt_t opt = std::static_pointer_cast<struct kmat::unitig_options>(options);
             return kmat::main_unitig(opt);
         }
+        else if (cmd == kmat::COMMAND::CONNECTEDCOMPONENTS) {
+            kmat::conncomp_opt_t opt = std::static_pointer_cast<struct kmat::conncomp_options>(options);
+            return kmat::main_connected_component(opt);
+        }
     }
     catch (const std::exception& e)
     {
