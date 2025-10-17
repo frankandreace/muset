@@ -56,22 +56,9 @@ message(STATUS "  Host System Version: ${CMAKE_HOST_SYSTEM_VERSION}")
 ############################################################
 ## Compiler flags
 
+# Set base flags for all targets
 set(CMAKE_CXX_FLAGS_DEBUG "-g -pthread")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-ignored-qualifiers -Wno-char-subscripts -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
-
-if (UNIX)
-  if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
-    # flags for PTHash
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2 -msse4.2")
-  endif()
-endif()
-
-if (ARCH_NATIVE)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-endif()
-
-message(STATUS "  CXX Compiler flags: ${CMAKE_CXX_FLAGS}")
 
 ############################################################
 ## Dependencies
@@ -273,3 +260,24 @@ target_link_libraries(graph_handler_tests PRIVATE
 )
 add_dependencies(graph_handler_tests ${deps})
 add_test(NAME graph_handler_tests COMMAND graph_handler_tests)
+
+# Then later, after creating your targets, add architecture-specific flags
+if (UNIX AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
+    target_compile_options(kmat_tools PRIVATE -mbmi2 -msse4.2)
+    target_compile_options(muset PRIVATE -mbmi2 -msse4.2)
+    target_compile_options(muset_pa PRIVATE -mbmi2 -msse4.2)
+endif()
+
+if (ARCH_NATIVE)
+    target_compile_options(kmat_tools PRIVATE -march=native)
+    target_compile_options(muset PRIVATE -march=native)
+    target_compile_options(muset_pa PRIVATE -march=native)
+endif()
+
+
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")

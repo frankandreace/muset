@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <numeric>
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -61,7 +62,7 @@ int kmat_basic_filter(fs::path input, filter_opt_t opt) {
         }
 
         bool enough_absent = (!opt->min_nb_absent_set && nb_absent >= opt->min_frac_absent * nb_samples)
-            || (opt->min_nb_absent_set && nb_absent >= opt->min_nb_absent);    
+            || (opt->min_nb_absent_set && nb_absent >= opt->min_nb_absent);
         bool enough_present = (!opt->min_nb_present_set && nb_present >= opt->min_frac_present * nb_samples)
             || (opt->min_nb_present_set && nb_present >= opt->min_nb_present);
         if (enough_absent && enough_present) {
@@ -83,7 +84,7 @@ int kmat_basic_filter(fs::path input, filter_opt_t opt) {
 
 template<size_t MAX_K>
 struct kmtricks_matrix_filter {
-    
+
     using count_type = typename km::selectC<DMAX_C>::type;
 
     void operator()(filter_opt_t opts)
