@@ -43,7 +43,9 @@ int main_connected_component(conncomp_opt_t opt)
         throw std::runtime_error("minimizer size must be smaller than k-mer size");
     }
 
-    spdlog::info("building k-mer dictionary");
+    spdlog::info("building k-mer dictionary.");
+    spdlog::info(fmt::format("Storing info for {}.sshash.log", opt->prefix));
+
 
     sshash::dictionary kmer_dict;
     {
@@ -65,6 +67,7 @@ int main_connected_component(conncomp_opt_t opt)
 
         std::cout.rdbuf(coutbuf);
     }
+    spdlog::info("Finished building k-mer dictionary");
     size_t max_utgs {kmer_dict.num_contigs()};
     spdlog::debug(fmt::format("k-mer processed: {}", kmer_dict.size()));
     spdlog::debug(fmt::format("unitigs processed: {}", max_utgs));
@@ -72,10 +75,11 @@ int main_connected_component(conncomp_opt_t opt)
     ////////////////////////////////////////////////
 
     // COMPUTING CONNECTED COMPONENTS
+    spdlog::info("Graph Handling.");
     GraphHandler handler(unitig_path);
     handler.read_graph_into_connected_components();
     std::vector<std::vector<uint64_t>> connected_components = handler.get_components();
-
+    spdlog::info(fmt::format("Computed {} connected components.", connected_components.size()));
     // REORGANIZING UNITIGS IDS FOR CONNECTED COMPONENTS METRICS
     // TODO: I WILL DO IT WHEN ALL THE OTHER LOGICS ARE IMPLEMENTED
 

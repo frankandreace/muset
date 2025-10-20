@@ -16,6 +16,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(cmake_path "${PROJECT_SOURCE_DIR}/cmake")
 
+###########################################################
+## Required minimum compiler version
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+        message(FATAL_ERROR "GCC version must be at least 9.0 for full C++17 support. Current version: ${CMAKE_CXX_COMPILER_VERSION}")
+    endif()
+endif()
+
 ############################################################
 ## Options
 

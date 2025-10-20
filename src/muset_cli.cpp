@@ -171,7 +171,7 @@ muset_options_t muset_cli(std::shared_ptr<bc::Parser<0>> cli, muset_options_t op
         ->checker(bc::check::is_number)
         ->setter(options->nb_threads);
 
-    cli->add_param("--connected_components", "output metrics for connected components, not only unitigs. Includes automatically -e.")
+    cli->add_param("--connected-components", "output metrics for connected components, not only unitigs. Includes automatically -e.")
         ->as_flag()
         ->setter(options->connected_components);
 

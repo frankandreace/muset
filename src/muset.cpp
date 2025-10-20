@@ -55,7 +55,9 @@ void print_options(muset::muset_options_t opt) {
     spdlog::info(fmt::format("write unitig sequence (-s): {}", opt->write_utg_seq));
     spdlog::info(fmt::format("output unitig fraction matrix (--out-frac): {}", opt->write_frac_matrix));
     spdlog::info(fmt::format("input consists of logan unitigs (--logan): {}", opt->logan));
-    spdlog::info(fmt::format("minimizer size (-m): {}", opt->mini_size));
+    spdlog::info(fmt::format("compute metrics for connected components: {}", opt->connected_components));
+    spdlog::info(fmt::format("compute unitig links: {}", opt->unitig_edges));
+    spdlog::info(fmt::format("Abundance metric: {}", opt->abundance_metric.string()));
 
     if(opt->min_nb_absent_set) {
         spdlog::info(fmt::format("number of absent samples (-n): {}", opt->min_nb_absent));
