@@ -183,7 +183,7 @@ int main_connected_component(conncomp_opt_t opt)
     // WRITING THE CONNECTED COMPONENT LIST IN GZIPPED TSV
     spdlog::info("writing connected_components list in tsv");
 
-    std::string cc_nodes_prefix = opt->prefix + "_connected_components_to_nodes.tsv.gz";
+    std::string cc_nodes_prefix = opt->prefix + "connected_components_to_nodes.tsv.gz";
     CompressedTSVComponentWriter cc_list_writer(cc_nodes_prefix);
     for(uint64_t cc_id=0; cc_id < connected_components.size(); cc_id++) {
         std::string comp_id = fmt::format("CC_{}",cc_id);
