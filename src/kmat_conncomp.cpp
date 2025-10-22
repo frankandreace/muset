@@ -75,8 +75,9 @@ int main_connected_component(conncomp_opt_t opt)
     ////////////////////////////////////////////////
 
     // COMPUTING CONNECTED COMPONENTS
-    spdlog::info("Graph Handling.");
+    spdlog::info(fmt::format("Handling {} graph.", unitig_path.c_str()));
     GraphHandler handler(unitig_path);
+    spdlog::info("Computing connected components.");
     handler.read_graph_into_connected_components();
     std::vector<std::vector<uint64_t>> connected_components = handler.get_components();
     spdlog::info(fmt::format("Computed {} connected components.", connected_components.size()));

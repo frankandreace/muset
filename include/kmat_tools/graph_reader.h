@@ -114,6 +114,7 @@ public:
   GraphHandler(std::string filename)
   {
     // Opening file
+    spdlog::info(fmt::format("[Graph-Handler] Opening {}.", filename.c_str()));
     klibpp::SeqStreamIn seq_stream(filename.c_str());
     if (!seq_stream)
     {
@@ -127,15 +128,19 @@ public:
     {
       m_unitigs_count++;
     }
+    spdlog::info(fmt::format("[Graph-Handler] Counted {} unitigs.", m_unitigs_count));
     // Resize vectors
+    spdlog::info("[Graph-Handler] Resizing vectors.");
     m_group.resize(m_unitigs_count);
     m_size.resize(m_unitigs_count, 0);
 
     // Fill group vector
+    spdlog::info("[Graph-Handler] Filling group vector.");
     for (uint64_t utg{0}; utg < m_unitigs_count; utg++)
     {
       m_group[utg] = utg;
     }
+    spdlog::info("[Graph-Handler] DONE.");
   }
 
   ~GraphHandler() = default;
@@ -143,6 +148,7 @@ public:
   void read_graph_into_connected_components()
   {
     // Open file
+    spdlog::info(fmt::format("[Graph-Handler] Re-Opening {}.", m_filename.c_str()));
     klibpp::SeqStreamIn seq_stream(m_filename.c_str());
     if (!seq_stream)
     {
@@ -155,6 +161,7 @@ public:
     klibpp::KSeq record;
     char fasta_comment_delimiter{' '};
     char link_delimiter{':'};
+    spdlog::info(fmt::format("[Graph-Handler] Opening {} for unitig link extraction.", m_filename.c_str()));
     while (seq_stream >> record)
     {
       uint64_t utg_id, linked_node;
@@ -189,6 +196,7 @@ public:
       }
       if (!is_used){m_size[utg_id] = 1; spdlog::debug(fmt::format("NODE {} had no links. It is still its own component.", utg_id));}
     }
+  spdlog::info("[Graph-Handler] Done. Now getting components.");
   }
 
   std::vector<std::vector<uint64_t>> get_components(){
@@ -196,7 +204,7 @@ public:
     // Pass 1 is to count the # of connected components and their size;
     // Then I allocate the vector of vectors accordingly to then avoid any reallocations
     // Finally I scan again and put the nodes into their cc
-
+    spdlog::info("[Graph-Handler] Dumping components.");
     std::unordered_map<uint64_t, uint64_t> rootCount;
     for(uint64_t utg {0}; utg < m_unitigs_count; utg++){
       uint64_t set_repr {find_set(utg)};
