@@ -301,12 +301,17 @@ int main(int argc, char* argv[])
 
         spdlog::info(fmt::format("Building unitigs"));
         muset_opt->unitigs = muset_opt->out_dir/"unitigs";
-        if(muset_opt->connected_components) {muset_opt->unitig_edges = true;} // always true if connected_components
+        if(muset_opt->connected_components) {muset_opt->unitig_edges = true; muset_opt->min_utg_len = 0;} // always true if connected_components ; do not discard any unitig.
         ggcat(muset_opt);
 
-        spdlog::info(fmt::format("Filtering unitigs"));
-        muset_opt->filtered_unitigs = muset_opt->out_dir/"unitigs.fa";
-        kmat_fafmt(muset_opt);
+        if( ! muset_opt->connected_components ) {
+            spdlog::info(fmt::format("Filtering unitigs"));
+            muset_opt->filtered_unitigs = muset_opt->out_dir/"unitigs.fa";
+            kmat_fafmt(muset_opt);
+        }
+        else {
+            muset_opt->filtered_unitigs = muset_opt->out_dir/"unitigs";
+        }
 
         if(fs::is_empty(muset_opt->filtered_unitigs)) {
             muset_opt->remove_temp_files();
